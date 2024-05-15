@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abrikos", "Abrikos.csproj", "{AD54E58A-A665-47A0-B579-E32877456464}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD54E58A-A665-47A0-B579-E32877456464}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD54E58A-A665-47A0-B579-E32877456464}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD54E58A-A665-47A0-B579-E32877456464}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD54E58A-A665-47A0-B579-E32877456464}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0750FD4F-FBDE-4230-A6DE-FF46DE151A34}
+	EndGlobalSection
+EndGlobal
