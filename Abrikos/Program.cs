@@ -337,11 +337,11 @@ class Program
         long memoryUsedA = memoryAfter - memoryBefore;
 
         Console.WriteLine("Пункт а):");
-        PrintJaggedArray2(jaggedArray);
+        PrintJaggedArray(jaggedArray);
 
         // Вимірювання пам'яті для пункту б)
         memoryBefore = GC.GetTotalMemory(true);
-        var optimizedJaggedArray = CreateOptimizedJaggedArray(n);
+        int[][] optimizedJaggedArray = CreateOptimizedJaggedArray(n);
         memoryAfter = GC.GetTotalMemory(true);
         long memoryUsedB = memoryAfter - memoryBefore;
 
@@ -351,8 +351,8 @@ class Program
         // Виведення використаної пам'яті
         Console.WriteLine("Використання пам'яті в пункті а): " + memoryUsedA + " байт");
         Console.WriteLine("Використання пам'яті в пункті б): " + memoryUsedB + " байт");
-        Console.WriteLine();
     }
+
     // Функція для обчислення суми цифр числа
     static int SumOfDigits(int number)
     {
@@ -378,15 +378,18 @@ class Program
                 continue;
             }
 
-            List<int> multiples = new List<int>();
+            int[] multiples = new int[n];
+            int count = 0;
             for (int j = 1; j <= n; j++)
             {
                 if (j % sumDigits == 0)
                 {
-                    multiples.Add(j);
+                    multiples[count++] = j;
                 }
             }
-            jaggedArray[i] = multiples.ToArray();
+
+            Array.Resize(ref multiples, count);
+            jaggedArray[i] = multiples;
         }
         return jaggedArray;
     }
@@ -394,61 +397,39 @@ class Program
     // Пункт б): Створення зубчастого масиву з оптимізацією пам'яті
     static int[][] CreateOptimizedJaggedArray(int n)
     {
-        // Створюємо зубчастий масив для зберігання послідовностей чисел, кратних кожній можливій сумі цифр
-        // Максимальна сума цифр для числа до 999999 (9*6 = 54, але беремо з запасом, тому використовуємо 46)
-        int[][] sumsArray = new int[46][];
-
-        // Створюємо зубчастий масив, де кожен індекс буде вказувати на відповідну послідовність чисел
-        int[][] optimizedJaggedArray = new int[n][];
-
-        // Проходимося по всіх числах від 0 до n-1
-        for (int i = 0; i < n; i++)
-        {
-            // Обчислюємо суму цифр поточного числа i
-            int sumDigits = SumOfDigits(i);
-
-            // Якщо сума цифр дорівнює 0 (наприклад, число 0), зберігаємо масив з єдиним елементом 0
-            if (sumDigits == 0)
-            {
-                optimizedJaggedArray[i] = new int[] { 0 };
-                continue; // Переходимо до наступного числа
-            }
-
-            // Якщо для даної суми цифр ще не створено послідовність чисел
-            if (sumsArray[sumDigits] == null)
-            {
-                // Створюємо тимчасовий масив для зберігання чисел, кратних сумі цифр
-                int[] multiples = new int[n];
-                int count = 0; // Лічильник кількості кратних чисел
-
-                // Проходимося по всіх числах від 1 до n
-                for (int j = 1; j <= n; j++)
-                {
-                    // Якщо число j кратне сумі цифр, додаємо його до тимчасового масиву
-                    if (j % sumDigits == 0)
-                    {
-                        multiples[count++] = j;
-                    }
-                }
-
-                // Змінюємо розмір тимчасового масиву до фактичної кількості кратних чисел
-                Array.Resize(ref multiples, count);
-
-                // Зберігаємо цей масив в sumsArray для відповідної суми цифр
-                sumsArray[sumDigits] = multiples;
-            }
-
-            // Встановлюємо посилання на відповідний масив з sumsArray у optimizedJaggedArray
-            optimizedJaggedArray[i] = sumsArray[sumDigits];
-        }
-
-        // Повертаємо заповнений оптимізований зубчастий масив
-        return optimizedJaggedArray;
+        int l = n;
+        DifSum(ref n); // Визначаємо максимальну суму цифр числа в діапазоні від 1 до l і оновлюємо n.
+        int[][] jaggedArray = new int[n][];
+        Calculation(l, ref jaggedArray); // Створюємо зубчастий масив з оптимізацією пам'яті.
+        return jaggedArray;
     }
 
+    // Метод для обчислення масиву кратних чисел для кожної суми цифр
+    static void Calculation(int n, ref int[][] jaggedArray)
+    {
+        for (int i = 1; i <= jaggedArray.GetLength(0); i++) // Проходимо через всі можливі суми цифр від 1 до максимальної суми цифр
+        {
+            int s = i; // Задаємо поточну суму цифр s, яка дорівнює i
+            int a = 0; // Ініціалізуємо індекс a для заповнення масиву
+            int count = 0; // Ініціалізуємо лічильник count для підрахунку кількості чисел, кратних сумі s
+            jaggedArray[i - 1] = new int[n]; // Ініціалізуємо масив для поточної суми цифр максимально можливого розміру n
 
-    // Виведення зубчастого масиву
-    static void PrintJaggedArray2(int[][] jaggedArray)
+            for (int j = 1; j <= n; j++) // Проходимо через всі числа від 1 до n
+            {
+                if (j % s == 0) // Перевіряємо, чи число j кратне сумі цифр s
+                {
+                    jaggedArray[i - 1][a] = j; // Якщо так, додаємо число j в масив для поточної суми цифр s
+                    count++; // Збільшуємо лічильник count на 1
+                    a++; // Збільшуємо індекс a для наступного запису в масив
+                }
+            }
+
+            Array.Resize(ref jaggedArray[i - 1], count); // Обрізаємо масив до фактичного розміру, залишаючи тільки знайдені кратні числа
+        }
+    }
+
+    // Метод для виведення зубчастого масиву (для пункту а)
+    static void PrintJaggedArray(int[][] jaggedArray)
     {
         for (int i = 0; i < jaggedArray.Length; i++)
         {
@@ -461,18 +442,51 @@ class Program
         }
     }
 
-    // Виведення оптимізованого зубчастого масиву
-    static void PrintOptimizedJaggedArray(int n, int[][] optimizedJaggedArray)
+    // Метод для виведення оптимізованого зубчастого масиву
+    static void PrintOptimizedJaggedArray(int n, int[][] jaggedArray)
     {
-        for (int i = 0; i < n; i++)
+        Console.WriteLine("Результат:");
+        for (int i = 0; i <= n-1; i++) // Починаємо з 0
         {
-            Console.Write(i + ": ");
-            foreach (var num in optimizedJaggedArray[i])
+            Console.Write(i + ": "); // Виводимо індекс поточного числа
+            int s = SumOfDigits(i); // Обчислюємо суму цифр поточного числа
+            if (s > 0) // Додаємо перевірку, щоб уникнути виходу за межі масиву
             {
-                Console.Write(num + " ");
+                for (int j = 0; j < jaggedArray[s - 1].Length; j++) // Ітеруємо по всіх елементах масиву, що відповідає сумі цифр
+                {
+                    Console.Write(jaggedArray[s - 1][j] + " "); // Виводимо всі числа з масиву, які кратні сумі цифр
+                }
+            }
+            else
+            {
+                Console.Write("0 "); // Якщо сума цифр 0, то виводимо 0
             }
             Console.WriteLine();
         }
+    }
+
+    // Метод для визначення максимальної суми цифр числа в діапазоні від 1 до n
+    static void DifSum(ref int n)
+    {
+        // Ініціалізуємо змінну для збереження максимальної суми цифр
+        int max = 0;
+
+        // Перебираємо всі числа від 1 до n
+        for (int i = 1; i <= n; i++)
+        {
+            // Обчислюємо суму цифр поточного числа i
+            int sumDigits = SumOfDigits(i);
+
+            // Якщо обчислена сума цифр більше поточного максимуму
+            if (sumDigits > max)
+            {
+                // Оновлюємо максимальну суму цифр
+                max = sumDigits;
+            }
+        }
+
+        // Оновлюємо значення n до максимальної суми цифр
+        n = max;
     }
 
     static void DoBlock_3()
@@ -576,18 +590,6 @@ class Program
         }
 
         return newArray;
-    }
-
-    static void PrintJaggedArray(int[][] jaggedArray)
-    {
-        for (int i = 0; i < jaggedArray.Length; i++)
-        {
-            for (int j = 0; j < jaggedArray[i].Length; j++)
-            {
-                Console.Write(jaggedArray[i][j] + " ");
-            }
-            Console.WriteLine();
-        }
     }
     static int[][] InputJaggedArray()
     {
